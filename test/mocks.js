@@ -27,5 +27,13 @@ export default {
       headers: {}
     }
   },
-  retryInterval: 1
+  retryInterval: 1,
+  report: {
+    execTime: 100,
+    targetUrl: 'http://fakesource/page/0',
+    numScrapedImages: 1,
+    numFilteredImages: 1,
+    numSavedImages: 1,
+    threshold: 1
+  }
 };

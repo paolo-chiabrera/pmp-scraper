@@ -2,7 +2,6 @@ import {expect} from 'chai';
 import sinon from 'sinon';
 
 import async from 'async';
-import winston from 'winston';
 import _ from 'lodash';
 
 import saveImages from '../../lib/modules/saveImages';
@@ -30,7 +29,8 @@ describe('saveImages', function () {
     const save = this.stub(PmpImage.prototype, 'save', (args, callback) => {
       callback(fakeError);
     });
-    const log = this.stub(winston, 'error', (label, message) => {
+    const log = this.spy((level, label, message) => {
+      expect(level).to.equal('warn');
       expect(label).to.equal('pmpImage.save');
       expect(message).to.equal(message);
     });
@@ -40,14 +40,16 @@ describe('saveImages', function () {
       sinon.assert.calledOnce(log);
 
       save.restore();
-      log.restore();
       done();
     });
 
     saveImages({
       links: mocks.filteredDuplicates,
       source: mocks.source,
-      options: mocks.options
+      options: mocks.options,
+      logger: {
+        log: log
+      }
     }, cb);
   }));
 
