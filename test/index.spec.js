@@ -134,7 +134,6 @@ describe('pmp-scraper', function () {
 
     it('should call all the chained methods', sinon.test(function (done) {
       const auto = this.spy(async, 'auto');
-      // const logInfo = this.stub(winston, 'info', () => {});
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
@@ -145,9 +144,7 @@ describe('pmp-scraper', function () {
         sinon.assert.calledOnce(filterDuplicates);
         sinon.assert.calledOnce(getImagesThreshold);
         sinon.assert.calledOnce(saveImages);
-        // sinon.assert.calledOnce(logInfo);
 
-        // logInfo.restore();
         auto.restore();
         done();
       });
@@ -155,6 +152,121 @@ describe('pmp-scraper', function () {
       pmpScraper.scrapePage({
         options: mocks.options,
         pageNumber: mocks.pageNumber,
+        source: mocks.source
+      }, cb);
+    }));
+  });
+
+  describe('scrapePageForever', function () {
+    it('should be defined', function () {
+      expect(pmpScraper.scrapePageForever).to.be.a('function');
+    });
+
+    it('should return an error: validation', sinon.test(function (done) {
+      const cb = this.spy(err => {
+        expect(err).to.be.an('error');
+        done();
+      });
+
+      pmpScraper.scrapePageForever({}, cb);
+    }));
+
+    it('should return an error: async.forever', sinon.test(function (done) {
+      const fakeError = new Error('fakeError');
+      const forever = this.stub(async, 'forever', (worker, callback) => {
+        callback(fakeError);
+      });
+      const log = this.stub(pmpScraper.logger, 'log');
+
+      const cb = this.spy(err => {
+        expect(err).to.be.a('null');
+        sinon.assert.calledOnce(forever);
+        sinon.assert.calledWith(log, 'error', 'async.forever');
+
+        forever.restore();
+        log.restore();
+        done();
+      });
+
+      pmpScraper.scrapePageForever({
+        source: mocks.source
+      }, cb);
+    }));
+
+    it('should return an error: scrapePage', sinon.test(function (done) {
+      const fakeError = new Error('fakeError');
+      const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, done) => {
+        done(fakeError);
+      });
+      const log = this.stub(pmpScraper.logger, 'log');
+
+      const cb = this.spy(err => {
+        expect(err).to.be.a('null');
+        sinon.assert.calledOnce(scrapePage);
+        sinon.assert.calledWith(log, 'error', 'async.forever', fakeError);
+
+        scrapePage.restore();
+        log.restore();
+        done();
+      });
+
+      pmpScraper.scrapePageForever({
+        source: mocks.source
+      }, cb);
+    }));
+
+    it('should return a message: threshold', sinon.test(function (done) {
+      const thresholdError = new Error('threshold not reached: 0');
+      const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, done) => {
+        done(null, {
+          threshold: 0
+        });
+      });
+      const log = this.stub(pmpScraper.logger, 'log');
+
+      const cb = this.spy(err => {
+        expect(err).to.be.a('null');
+        sinon.assert.calledOnce(scrapePage);
+        sinon.assert.calledWith(log, 'error', 'async.forever', thresholdError);
+        sinon.assert.calledWith(log, 'info', 'scrapeSource.end');
+
+        scrapePage.restore();
+        log.restore();
+        done();
+      });
+
+      pmpScraper.scrapePageForever({
+        source: mocks.source
+      }, cb);
+    }));
+
+    it('should increase the pageNumber', sinon.test(function (done) {
+      const thresholdError = new Error('threshold not reached: 0');
+      const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, callback) => {
+        if(args.pageNumber == 0){
+          callback(null, {
+            threshold: 1
+          });
+        } else {
+          callback(null, {
+            threshold: 0
+          });
+        }
+      });
+      const log = this.stub(pmpScraper.logger, 'log');
+
+      const cb = this.spy(err => {
+        expect(err).to.be.a('null');
+        sinon.assert.calledTwice(scrapePage);
+        sinon.assert.calledWith(log, 'error', 'async.forever', thresholdError);
+        expect(pmpScraper.pageNumber).to.equal(1);
+
+        scrapePage.restore();
+        log.restore();
+        done();
+      });
+
+      pmpScraper.scrapePageForever({
         source: mocks.source
       }, cb);
     }));
@@ -361,7 +473,7 @@ describe('pmp-scraper', function () {
       expect(pmpScraper.scrapeSource).to.be.a('function');
     });
 
-    it('should raise a validation error', sinon.test(function (done) {
+    it('should raise an error: validation', sinon.test(function (done) {
       const cb = this.spy((err) => {
         expect(err).to.be.an('error');
         done();
@@ -372,16 +484,17 @@ describe('pmp-scraper', function () {
       }, cb);
     }));
 
-    it('should call scrapePage only once', sinon.test(function (done) {
-      const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, done) => {
-        done(null);
+    it('should raise an error: main.ensureFolderPath', sinon.test(function (done) {
+      const fakeError = new Error('fakeError');
+      const ensureFolderPath = this.stub(main, 'ensureFolderPath', (args, done) => {
+        done(fakeError);
       });
 
       const cb = this.spy(err => {
-        expect(err).to.be.a('null');
-        sinon.assert.calledOnce(scrapePage);
+        expect(err).to.eql(fakeError);
+        sinon.assert.calledOnce(ensureFolderPath);
 
-        scrapePage.restore();
+        ensureFolderPath.restore();
         done();
       });
 
@@ -391,98 +504,45 @@ describe('pmp-scraper', function () {
       }, cb);
     }));
 
-    it('should return an error: async.forever', sinon.test(function (done) {
-      const fakeError = new Error('fakeError');
-      const forever = this.stub(async, 'forever', (worker, callback) => {
-        callback(fakeError);
-      });
-      const log = this.stub(pmpScraper.logger, 'log');
-
-      const cb = this.spy(err => {
-        expect(err).to.be.a('null');
-        sinon.assert.calledOnce(forever);
-        sinon.assert.calledWith(log, 'error', 'async.forever');
-
-        forever.restore();
-        log.restore();
-        done();
-      });
-
-      pmpScraper.scrapeSource({
-        source: mocks.source
-      }, cb);
-    }));
-
-    it('should return an error: scrapePage', sinon.test(function (done) {
-      const fakeError = new Error('fakeError');
+    it('should call scrapePage', sinon.test(function (done) {
       const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, done) => {
-        done(fakeError);
+        done(null);
       });
-      const log = this.stub(pmpScraper.logger, 'log');
+      const ensureFolderPath = this.stub(main, 'ensureFolderPath', (args, done) => {
+        done(null);
+      });
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(scrapePage);
-        sinon.assert.calledWith(log, 'error', 'async.forever', fakeError);
+        sinon.assert.calledOnce(ensureFolderPath);
 
         scrapePage.restore();
-        log.restore();
+        ensureFolderPath.restore();
         done();
       });
 
       pmpScraper.scrapeSource({
-        source: mocks.source
+        source: mocks.source,
+        pageNumber: 0
       }, cb);
     }));
 
-    it('should return a message: threshold', sinon.test(function (done) {
-      const thresholdError = new Error('threshold not reached: 0');
-      const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, done) => {
-        done(null, {
-          threshold: 0
-        });
+    it('should call scrapePageForever', sinon.test(function (done) {
+      const scrapePageForever = this.stub(pmpScraper, 'scrapePageForever', (args, done) => {
+        done(null);
       });
-      const log = this.stub(pmpScraper.logger, 'log');
+      const ensureFolderPath = this.stub(main, 'ensureFolderPath', (args, done) => {
+        done(null);
+      });
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
-        sinon.assert.calledOnce(scrapePage);
-        sinon.assert.calledWith(log, 'error', 'async.forever', thresholdError);
-        sinon.assert.calledWith(log, 'info', 'scrapeSource.end');
+        sinon.assert.calledOnce(scrapePageForever);
+        sinon.assert.calledOnce(ensureFolderPath);
 
-        scrapePage.restore();
-        log.restore();
-        done();
-      });
-
-      pmpScraper.scrapeSource({
-        source: mocks.source
-      }, cb);
-    }));
-
-    it('should increase the pageNumber', sinon.test(function (done) {
-      const thresholdError = new Error('threshold not reached: 0');
-      const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, callback) => {
-        if(args.pageNumber == 0){
-          callback(null, {
-            threshold: 1
-          });
-        } else {
-          callback(null, {
-            threshold: 0
-          });
-        }
-      });
-      const log = this.stub(pmpScraper.logger, 'log');
-
-      const cb = this.spy(err => {
-        expect(err).to.be.a('null');
-        sinon.assert.calledTwice(scrapePage);
-        sinon.assert.calledWith(log, 'error', 'async.forever', thresholdError);
-        expect(pmpScraper.pageNumber).to.equal(1);
-
-        scrapePage.restore();
-        log.restore();
+        scrapePageForever.restore();
+        ensureFolderPath.restore();
         done();
       });
 
