@@ -46,10 +46,9 @@ describe('pmp-scraper', function () {
 
   describe('scrapePage', function () {
 
-    let getPageUrl, scrapeUrl, filterLinks, filterDuplicates, getImagesThreshold, saveImages, generateReport, updateStats, log;
+    let getPageUrl, scrapeUrl, filterLinks, filterDuplicates, getImagesThreshold, saveImages, generateReport, updateStats;
 
     beforeEach(function () {
-      log = sinon.stub(pmpScraper.logger, 'log');
       getPageUrl = sinon.stub(main, 'getPageUrl', (args, done) => {
         done(null, {
           url: mocks.targetUrl
@@ -87,7 +86,6 @@ describe('pmp-scraper', function () {
     });
 
     afterEach(function () {
-      log.restore();
       getPageUrl.restore();
       scrapeUrl.restore();
       filterLinks.restore();
@@ -176,15 +174,15 @@ describe('pmp-scraper', function () {
       const forever = this.stub(async, 'forever', (worker, callback) => {
         callback(fakeError);
       });
-      const log = this.stub(pmpScraper.logger, 'log');
+      const emit = this.stub(pmpScraper, 'emit');
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(forever);
-        sinon.assert.calledWith(log, 'error', 'async.forever');
+        sinon.assert.calledWith(emit, 'error', 'async.forever');
 
         forever.restore();
-        log.restore();
+        emit.restore();
         done();
       });
 
@@ -198,15 +196,15 @@ describe('pmp-scraper', function () {
       const scrapePage = this.stub(pmpScraper, 'scrapePage', (args, done) => {
         done(fakeError);
       });
-      const log = this.stub(pmpScraper.logger, 'log');
+      const emit = this.stub(pmpScraper, 'emit');
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(scrapePage);
-        sinon.assert.calledWith(log, 'error', 'async.forever', fakeError);
+        sinon.assert.calledWith(emit, 'error', 'async.forever', fakeError);
 
         scrapePage.restore();
-        log.restore();
+        emit.restore();
         done();
       });
 
@@ -222,16 +220,16 @@ describe('pmp-scraper', function () {
           threshold: 0
         });
       });
-      const log = this.stub(pmpScraper.logger, 'log');
+      const emit = this.stub(pmpScraper, 'emit');
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(scrapePage);
-        sinon.assert.calledWith(log, 'error', 'async.forever', thresholdError);
-        sinon.assert.calledWith(log, 'info', 'scrapeSource.end');
+        sinon.assert.calledWith(emit, 'error', 'async.forever', thresholdError);
+        sinon.assert.calledWith(emit, 'info', 'scrapeSource.end');
 
         scrapePage.restore();
-        log.restore();
+        emit.restore();
         done();
       });
 
@@ -253,16 +251,16 @@ describe('pmp-scraper', function () {
           });
         }
       });
-      const log = this.stub(pmpScraper.logger, 'log');
+      const emit = this.stub(pmpScraper, 'emit');
 
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledTwice(scrapePage);
-        sinon.assert.calledWith(log, 'error', 'async.forever', thresholdError);
+        sinon.assert.calledWith(emit, 'error', 'async.forever', thresholdError);
         expect(pmpScraper.pageNumber).to.equal(1);
 
         scrapePage.restore();
-        log.restore();
+        emit.restore();
         done();
       });
 

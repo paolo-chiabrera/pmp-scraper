@@ -29,27 +29,22 @@ describe('saveImages', function () {
     const save = this.stub(PmpImage.prototype, 'save', (args, callback) => {
       callback(fakeError);
     });
-    const log = this.spy((level, label, message) => {
-      expect(level).to.equal('warn');
-      expect(label).to.equal('pmpImage.save');
-      expect(message).to.equal(message);
-    });
+    const emit = this.spy();
     const cb = this.spy(err => {
       expect(err).to.be.a('null');
       sinon.assert.calledOnce(save);
-      sinon.assert.calledOnce(log);
+      sinon.assert.calledOnce(emit);
 
       save.restore();
       done();
     });
 
-    saveImages({
+    saveImages.call({
+      emit: emit
+    }, {
       links: mocks.filteredDuplicates,
       sourceId: mocks.source.id,
-      options: mocks.options,
-      logger: {
-        log: log
-      }
+      options: mocks.options
     }, cb);
   }));
 
