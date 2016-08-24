@@ -45,7 +45,7 @@ describe('saveImages', function () {
 
     saveImages({
       links: mocks.filteredDuplicates,
-      source: mocks.source,
+      sourceId: mocks.source.id,
       options: mocks.options,
       logger: {
         log: log
@@ -73,7 +73,7 @@ describe('saveImages', function () {
 
     saveImages({
       links: mocks.filteredDuplicates,
-      source: mocks.source,
+      sourceId: mocks.source.id,
       options: mocks.options
     }, cb);
   }));
@@ -97,7 +97,7 @@ describe('saveImages', function () {
 
     saveImages({
       links: mocks.filteredDuplicates,
-      source: mocks.source,
+      sourceId: mocks.source.id,
       options: mocks.options
     }, cb);
   }));

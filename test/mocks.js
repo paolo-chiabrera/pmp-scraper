@@ -13,14 +13,14 @@ export default {
     mainPageSelector: 'a.link',
     mainPageAttribute: 'href',
     imagePageSelector: 'img.image',
-    imagePageAttribute: 'src'
+    imagePageAttribute: 'src',
+    threshold: 0.75
   },
   options: {
     pmpApiUrl: 'http://api.picmeplease.eu',
     scraperApiUrl: 'http://api.scraper.d3lirium.eu',
     folderPath: './test-images',
     concurrency: 1,
-    threshold: 0.75,
     statsInterval: 10,
     request: {
       json: true,
