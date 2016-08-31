@@ -54,7 +54,7 @@
     "joi": "^9.0.4",
     "lodash": "^4.15.0",
     "needle": "^1.1.0",
-    "pmp-image": "0.0.10",
+    "pmp-image": ">=0.0.11",
     "pretty-bytes": "^3.0.1"
   }
 }
