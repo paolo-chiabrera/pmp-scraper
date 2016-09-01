@@ -35,5 +35,9 @@ export default {
     numFilteredImages: 1,
     numSavedImages: 1,
     threshold: 1
+  },
+  reindex: {
+    ffffound: 10,
+    piccsy: 10
   }
 };

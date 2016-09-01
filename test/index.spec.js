@@ -156,6 +156,19 @@ describe('pmp-scraper', function () {
   });
 
   describe('scrapePageForever', function () {
+
+    let reindexImages;
+
+    beforeEach(function () {
+      reindexImages = sinon.stub(main, 'reindexImages', (args, done) => {
+        done(null, mocks.reindex);
+      });
+    });
+
+    afterEach(function () {
+      reindexImages.restore();
+    });
+
     it('should be defined', function () {
       expect(pmpScraper.scrapePageForever).to.be.a('function');
     });
@@ -267,6 +280,47 @@ describe('pmp-scraper', function () {
       pmpScraper.scrapePageForever({
         source: mocks.source
       }, cb);
+    }));
+  });
+
+  describe('reindexImages', function () {
+    it('should be defined', function () {
+      expect(pmpScraper.reindexImages).to.be.a('function');
+    });
+
+    it('should emit an error', sinon.test(function (done) {
+      const fakeError = new Error('fakeError');
+      const reindexImages = this.stub(main, 'reindexImages', (args, next) => {
+        next(fakeError);
+      });
+      const emit = this.stub(pmpScraper, 'emit');
+
+      pmpScraper.reindexImages();
+
+      sinon.assert.calledOnce(reindexImages);
+      sinon.assert.calledWith(emit, 'warn', 'reindexImages', 'started');
+      sinon.assert.calledWith(emit, 'error', 'reindexImages', fakeError);
+
+      emit.restore();
+      reindexImages.restore();
+      done();
+    }));
+
+    it('should emit the result', sinon.test(function (done) {
+      const reindexImages = this.stub(main, 'reindexImages', (args, next) => {
+        next(null, mocks.reindex);
+      });
+      const emit = this.stub(pmpScraper, 'emit');
+
+      pmpScraper.reindexImages();
+
+      sinon.assert.calledOnce(reindexImages);
+      sinon.assert.calledWith(emit, 'warn', 'reindexImages', 'started');
+      sinon.assert.calledWith(emit, 'info', 'reindexImages', mocks.reindex);
+
+      emit.restore();
+      reindexImages.restore();
+      done();
     }));
   });
 
