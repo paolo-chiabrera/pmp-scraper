@@ -192,7 +192,7 @@ describe('pmp-scraper', function () {
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(forever);
-        sinon.assert.calledWith(emit, 'error', 'async.forever');
+        sinon.assert.calledWith(emit, 'scrape-error', fakeError);
 
         forever.restore();
         emit.restore();
@@ -214,7 +214,7 @@ describe('pmp-scraper', function () {
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(scrapePage);
-        sinon.assert.calledWith(emit, 'error', 'async.forever', fakeError);
+        sinon.assert.calledWith(emit, 'scrape-error', fakeError);
 
         scrapePage.restore();
         emit.restore();
@@ -238,8 +238,8 @@ describe('pmp-scraper', function () {
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledOnce(scrapePage);
-        sinon.assert.calledWith(emit, 'error', 'async.forever', thresholdError);
-        sinon.assert.calledWith(emit, 'info', 'scrapeSource.end');
+        sinon.assert.calledWith(emit, 'scrape-error', thresholdError);
+        sinon.assert.calledWith(emit, 'scrape-end');
 
         scrapePage.restore();
         emit.restore();
@@ -269,7 +269,7 @@ describe('pmp-scraper', function () {
       const cb = this.spy(err => {
         expect(err).to.be.a('null');
         sinon.assert.calledTwice(scrapePage);
-        sinon.assert.calledWith(emit, 'error', 'async.forever', thresholdError);
+        sinon.assert.calledWith(emit, 'scrape-error', thresholdError);
         expect(pmpScraper.pageNumber).to.equal(1);
 
         scrapePage.restore();
@@ -298,8 +298,8 @@ describe('pmp-scraper', function () {
       pmpScraper.reindexImages();
 
       sinon.assert.calledOnce(reindexImages);
-      sinon.assert.calledWith(emit, 'warn', 'reindexImages', 'started');
-      sinon.assert.calledWith(emit, 'error', 'reindexImages', fakeError);
+      sinon.assert.calledWith(emit, 'reindex-start');
+      sinon.assert.calledWith(emit, 'reindex-error', fakeError);
 
       emit.restore();
       reindexImages.restore();
@@ -315,8 +315,8 @@ describe('pmp-scraper', function () {
       pmpScraper.reindexImages();
 
       sinon.assert.calledOnce(reindexImages);
-      sinon.assert.calledWith(emit, 'warn', 'reindexImages', 'started');
-      sinon.assert.calledWith(emit, 'info', 'reindexImages', mocks.reindex);
+      sinon.assert.calledWith(emit, 'reindex-start');
+      sinon.assert.calledWith(emit, 'reindex-end', mocks.reindex);
 
       emit.restore();
       reindexImages.restore();
