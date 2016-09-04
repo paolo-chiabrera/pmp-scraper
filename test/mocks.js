@@ -14,7 +14,9 @@ export default {
     mainPageAttribute: 'href',
     imagePageSelector: 'img.image',
     imagePageAttribute: 'src',
-    threshold: 0.75
+    threshold: 0.75,
+    schedule: '0 0 0 * * * ',
+    active: true
   },
   options: {
     pmpApiUrl: 'http://api.picmeplease.eu',
