@@ -11,6 +11,7 @@
   "files": [
     "dist"
   ],
+  "bin": "bin/index.js",
   "main": "dist/index.js",
   "keywords": [
     "pmp picmeplease scraper"
@@ -34,7 +35,8 @@
     "gulp-nsp": "^2.1.0",
     "gulp-plumber": "^1.0.0",
     "isparta": "^3.0.3",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "sinon-chai": "^2.8.0"
   },
   "eslintConfig": {
     "extends": "xo-space",
@@ -50,11 +52,14 @@
   "license": "MIT",
   "dependencies": {
     "async": "^2.0.1",
+    "commander": "^2.9.0",
     "fs-extra": "^0.30.0",
     "joi": "^9.0.4",
     "lodash": "^4.15.0",
     "needle": "^1.1.0",
-    "pmp-image": ">=0.0.11",
+    "pmp-image": "^0.0.13",
+    "pmp-page": "^0.0.3",
+    "pmp-source": "^0.0.2",
     "pretty-bytes": "^3.0.1"
   }
 }

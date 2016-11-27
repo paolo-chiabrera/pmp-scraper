@@ -31,7 +31,6 @@ describe('generateReport', function () {
     generateReport({
       targetUrl: mocks.targetUrl,
       scrapedLinks: mocks.scrapedUrls,
-      validLinks: mocks.filteredDuplicates,
       threshold: 1,
       savedImages: mocks.savedImages,
       startTime: Date.now()
