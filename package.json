@@ -9,9 +9,12 @@
     "url": "https://github.com/paolo-chiabrera"
   },
   "files": [
+    "bin",
     "dist"
   ],
-  "bin": "bin/index.js",
+  "bin": {
+    "pmp-scraper": "./bin/index.js"
+  },
   "main": "dist/index.js",
   "keywords": [
     "pmp picmeplease scraper"
@@ -53,13 +56,12 @@
   "dependencies": {
     "async": "^2.0.1",
     "commander": "^2.9.0",
-    "fs-extra": "^0.30.0",
-    "joi": "^9.0.4",
+    "fs-extra": "^1.0.0",
+    "joi": "^10.0.1",
     "lodash": "^4.15.0",
     "needle": "^1.1.0",
     "pmp-image": "^0.0.13",
     "pmp-page": "^0.0.3",
-    "pmp-source": "^0.0.2",
-    "pretty-bytes": "^3.0.1"
+    "pmp-source": "^0.0.2"
   }
 }
