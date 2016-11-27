@@ -13,37 +13,10 @@ program
   .option('-s, --source [id]', 'SourceId')
   .option('-p, --page [number]', 'PageNumber')
   .option('-u, --pmp-api-url [url]', 'PmpApiUrl')
-  .option('-d, --deep', 'Deep')
   .parse(process.argv);
 
 if (program.source) {
   const pmpApiUrl = program.pmpApiUrl || PMP_API_URL;
-
-  if (program.deep) {
-    console.log(`Scraping [${program.source}], deep [${program.deep}], pmpApiUrl [${pmpApiUrl}]`);
-
-    PmpScraper.scrapeDeep({
-      options: {
-        pmpApiUrl,
-        request: {}
-      },
-      onScrapePage: (err, res) => {
-        console.log(err, res);
-      },
-      sourceId: program.source
-    }, (err, results) => {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-        return;
-      }
-
-      console.log('results', results);
-
-      process.exit();
-    });
-    return;
-  }
 
   if (program.page) {
     console.log(`Scraping [${program.source}], page [${program.page}], pmpApiUrl [${pmpApiUrl}]`);
@@ -66,5 +39,30 @@ if (program.source) {
 
       process.exit();
     });
+
+    return;
   }
+
+  console.log(`Scraping [${program.source}], pmpApiUrl [${pmpApiUrl}]`);
+
+  PmpScraper.scrapeSourceById({
+    options: {
+      pmpApiUrl,
+      request: {}
+    },
+    onScrapePage: (err, res) => {
+      console.log(err, res);
+    },
+    sourceId: program.source
+  }, (err, results) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+      return;
+    }
+
+    console.log('results', results);
+
+    process.exit();
+  });
 }

@@ -6,11 +6,11 @@ chai.use(sinonChai);
 
 import PmpSource from 'pmp-source';
 
-import main, { scrapeDeep } from '../../lib/modules/main';
+import main, { scrapeSourceById } from '../../lib/modules/main';
 
 import mocks from '../mocks';
 
-describe('scrapeDeep', function () {
+describe('scrapeSourceById', function () {
   let getSourceById;
   let ensureFolderPath;
 
@@ -27,7 +27,7 @@ describe('scrapeDeep', function () {
   });
 
   it('should be defined', function () {
-    expect(scrapeDeep).to.be.a('function');
+    expect(scrapeSourceById).to.be.a('function');
   });
 
   it('should return an error: validation', sinon.test(function (done) {
@@ -36,7 +36,7 @@ describe('scrapeDeep', function () {
       done();
     });
 
-    scrapeDeep({}, cb);
+    scrapeSourceById({}, cb);
   }));
 
   it('should return an error: scrapePage', sinon.test(function (done) {
@@ -55,7 +55,7 @@ describe('scrapeDeep', function () {
       done();
     });
 
-    scrapeDeep({
+    scrapeSourceById({
       options: mocks.options,
       sourceId: mocks.source.id,
       onScrapePage
@@ -84,7 +84,7 @@ describe('scrapeDeep', function () {
       done();
     });
 
-    scrapeDeep({
+    scrapeSourceById({
       options: mocks.options,
       sourceId: mocks.source.id,
       onScrapePage
@@ -120,7 +120,7 @@ describe('scrapeDeep', function () {
       done();
     });
 
-    scrapeDeep({
+    scrapeSourceById({
       options: mocks.options,
       sourceId: mocks.source.id,
       onScrapePage
