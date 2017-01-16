@@ -25,7 +25,8 @@ export default {
     concurrency: 1,
     request: {
       json: true,
-      headers: {}
+      headers: {},
+      open_timeout: 0
     }
   },
   retryInterval: 1,
