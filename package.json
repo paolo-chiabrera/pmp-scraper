@@ -60,8 +60,8 @@
     "joi": "^10.0.1",
     "lodash": "^4.15.0",
     "needle": "^1.1.0",
-    "pmp-image": "^0.0.13",
-    "pmp-page": "^0.0.3",
-    "pmp-source": "^0.0.2"
+    "pmp-image": "0.x",
+    "pmp-page": "0.x",
+    "pmp-source": "0.x"
   }
 }
