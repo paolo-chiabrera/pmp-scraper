@@ -41,12 +41,6 @@
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0"
   },
-  "eslintConfig": {
-    "extends": "xo-space",
-    "env": {
-      "mocha": true
-    }
-  },
   "repository": "https://github.com/paolo-chiabrera/pmp-scraper.git",
   "scripts": {
     "prepublish": "gulp prepublish",
@@ -57,7 +51,6 @@
     "async": "^2.0.1",
     "commander": "^2.9.0",
     "fs-extra": "^1.0.0",
-    "joi": "^10.0.1",
     "lodash": "^4.15.0",
     "needle": "^1.1.0",
     "pmp-image": "0.x",

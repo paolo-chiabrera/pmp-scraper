@@ -1,7 +1,6 @@
 import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-
 chai.use(sinonChai);
 
 import PmpSource from 'pmp-source';
@@ -11,75 +10,66 @@ import main, { scrapePageBySourceId } from '../../lib/modules/main';
 import mocks from '../mocks';
 
 describe('scrapePageBySourceId', function () {
-  let getSourceById;
-  let ensureFolderPath;
+	let getSourceById;
+	let ensureFolderPath;
 
-  beforeEach(function () {
-    getSourceById = sinon.stub(PmpSource, 'getSourceById', (args, done) => done(null, {
-      source: mocks.source
-    }));
-    ensureFolderPath = sinon.stub(main, 'ensureFolderPath', (args, done) => done(null, {}));
-  });
+	beforeEach(function () {
+		getSourceById = sinon.stub(PmpSource, 'getSourceById', (args, done) => done(null, {
+			source: mocks.source
+		}));
+		ensureFolderPath = sinon.stub(main, 'ensureFolderPath', (args, done) => done(null, {}));
+	});
 
-  afterEach(function () {
-    getSourceById.restore();
-    ensureFolderPath.restore();
-  });
+	afterEach(function () {
+		getSourceById.restore();
+		ensureFolderPath.restore();
+	});
 
-  it('should be defined', function () {
-    expect(scrapePageBySourceId).to.be.a('function');
-  });
+	it('should be defined', function () {
+		expect(scrapePageBySourceId).to.be.a('function');
+	});
 
-  it('should return an error: validation', sinon.test(function (done) {
-    const cb = this.spy(err => {
-      expect(err).to.be.an('error');
-      done();
-    });
+	it('should return an error: async.auto', sinon.test(function () {
+		const cb = this.spy();
+		const fakeError = new Error('error');
 
-    scrapePageBySourceId({}, cb);
-  }));
+		ensureFolderPath.restore();
+		ensureFolderPath = this.stub(main, 'ensureFolderPath', (args, done) => {
+			done(fakeError);
+		});
 
-  it('should return an error: async.auto', sinon.test(function () {
-    const cb = this.spy();
-    const fakeError = new Error('error');
+		scrapePageBySourceId({
+			options: mocks.options,
+			pageNumber: mocks.pageNumber,
+			sourceId: mocks.source.id
+		}, cb);
 
-    ensureFolderPath.restore();
-    ensureFolderPath = this.stub(main, 'ensureFolderPath', (args, done) => {
-      done(fakeError);
-    });
+		expect(getSourceById).to.have.been.calledOnce;
+		expect(ensureFolderPath).to.have.been.calledOnce;
+		expect(cb).to.have.been.calledWith(fakeError);
+	}));
 
-    scrapePageBySourceId({
-      options: mocks.options,
-      pageNumber: mocks.pageNumber,
-      sourceId: mocks.source.id
-    }, cb);
+	it('should return the results', sinon.test(function () {
+		const cb = this.spy();
+		const results = {
+			errors: [],
+			pageNumber: mocks.pageNumber,
+			report: {}
+		};
 
-    expect(getSourceById).to.have.been.calledOnce;
-    expect(ensureFolderPath).to.have.been.calledOnce;
-    expect(cb).to.have.been.calledWith(fakeError);
-  }));
+		const scrapePage = this.stub(main, 'scrapePage', (args, done) => {
+			done(null, results);
+		});
 
-  it('should return the results', sinon.test(function () {
-    const cb = this.spy();
-    const results = {
-      errors: [],
-      pageNumber: mocks.pageNumber,
-      report: {}
-    };
+		scrapePageBySourceId({
+			options: mocks.options,
+			pageNumber: mocks.pageNumber,
+			sourceId: mocks.source.id
+		}, cb);
 
-    const scrapePage = this.stub(main, 'scrapePage', (args, done) => {
-      done(null, results);
-    });
-
-    scrapePageBySourceId({
-      options: mocks.options,
-      pageNumber: mocks.pageNumber,
-      sourceId: mocks.source.id
-    }, cb);
-
-    expect(getSourceById).to.have.been.calledOnce;
-    expect(ensureFolderPath).to.have.been.calledOnce;
-    expect(scrapePage).to.have.been.calledOnce;
-    expect(cb).to.have.been.calledWith(null, results);
-  }));
+		expect(getSourceById).to.have.been.calledOnce;
+		expect(ensureFolderPath).to.have.been.calledOnce;
+		expect(scrapePage).to.have.been.calledOnce;
+		expect(cb).to.have.been.calledWith(null, results);
+	}));
 });
