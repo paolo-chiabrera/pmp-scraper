@@ -38,9 +38,9 @@ describe('scrapeSourceById', function () {
 		});
 
 		const cb = this.spy(err => {
-			expect(getSourceById).to.have.been.calledOnce;
-			expect(ensureFolderPath).to.have.been.calledOnce;
-			expect(onProgress).to.have.been.called;
+			expect(getSourceById).to.be.calledOnce;
+			expect(ensureFolderPath).to.be.calledOnce;
+			expect(onProgress).to.be.called;
 			expect(err).to.eql(fakeError);
 			done();
 		});
@@ -63,9 +63,9 @@ describe('scrapeSourceById', function () {
 		});
 
 		const cb = this.spy((err, results) => {
-			expect(getSourceById).to.have.been.calledOnce;
-			expect(ensureFolderPath).to.have.been.calledOnce;
-			expect(onProgress).to.have.been.called;
+			expect(getSourceById).to.be.calledOnce;
+			expect(ensureFolderPath).to.be.calledOnce;
+			expect(onProgress).to.be.called;
 			expect(err).to.be.null;
 			expect(results).to.eql({
 				pageNumber: 0,
@@ -85,7 +85,7 @@ describe('scrapeSourceById', function () {
 		const threshold = 0.1;
 		const onProgress = this.spy();
 
-		this.stub(main, 'scrapePage', (args, done) => {
+		const scrapePageStub = this.stub(main, 'scrapePage', (args, done) => {
 			if (args.pageNumber === 0) {
 				done(null, {
 					threshold: 1
@@ -99,9 +99,10 @@ describe('scrapeSourceById', function () {
 		});
 
 		const cb = this.spy((err, results) => {
-			expect(getSourceById).to.have.been.calledOnce;
-			expect(ensureFolderPath).to.have.been.calledOnce;
-			expect(onProgress).to.have.been.calledTwice;
+			expect(getSourceById).to.be.calledOnce;
+			expect(ensureFolderPath).to.be.calledOnce;
+			expect(onProgress).to.be.calledTwice;
+			expect(scrapePageStub).to.be.calledTwice;
 			expect(err).to.be.null;
 			expect(results).to.eql({
 				pageNumber: 1,
